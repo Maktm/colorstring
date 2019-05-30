@@ -65,11 +65,13 @@ class ColoredString:
     _color_pattern = r'\^[a-i0-8]'
     _repeater_pattern = r'[*]+[1-9]+'
     _color_and_repeater_pattern = ''.join([_color_pattern, _repeater_pattern])
+    _color_or_repeater_pattern = '|'.join([_color_pattern, _repeater_pattern])
 
     # Compiled regular expressions
     _color_regexp = re.compile(_color_pattern)
     _repeater_regexp = re.compile(_repeater_pattern)
     _color_and_repeater_regexp = re.compile(_color_and_repeater_pattern)
+    _color_or_repeater_regexp = re.compile(_color_or_repeater_pattern)
 
     def __init__(self, string: str) -> None:
         """Initialize an instance of ColoredString."""
@@ -89,13 +91,13 @@ class ColoredString:
             2. Replace all instances of repeaters with the ANSI color reset code
             3. Replace all instances of color specifiers with their ANSI color codes
         """
-        self._check_repeater_safety(string)
+        self._check_all_repeaters(string)
         no_repeaters_str = self._process_repeaters(string)
         ansi_compliant_str = self._process_colors(no_repeaters_str)
 
         return ansi_compliant_str
 
-    def _check_repeater_safety(self, string: str) -> None:
+    def _check_all_repeaters(self, string: str) -> None:
         """Iterates through all the repeaters in the string of the
         format *[count] where count = 1, 2, 3, etc. and ensures that
         there are no count values that are out-of-bound.
@@ -106,10 +108,22 @@ class ColoredString:
                 raise UnsafeRepeaterException(unsafe_check_info[1])
 
     def _is_unsafe_repeater(self, match: Match) -> Tuple[bool, int]:
-        """Determine whether the matched repeater is a safe repeater
+        """Determines whether the matched repeater is a safe repeater
         by checking whether the count index is out-of-bounds.
         """
-        return False, -1 # TODO: Placeholder, change!
+
+        # Calculate the maximum number that can be specified by the repeater
+        # in this instance by looking ahead at the characters left.
+        str_after_match = match.string[match.start() + len(match.group()):]
+        remaining_chars_len = self._remaining_str_len(str_after_match)
+
+        repeater_count_str = re.search('\*([1-9]+)', match.group()).groups()[0]
+        repeater_count = int(repeater_count_str)
+
+        if repeater_count > remaining_chars_len:
+            return True, repeater_count
+
+        return False, -1
 
     def _process_repeaters(self, string: str) -> str:
         """Replaces all instances of repeaters with an ANSI color
@@ -122,6 +136,17 @@ class ColoredString:
         of ^[color] with the ANSI color equivalent.
         """
         return string # TODO: Placeholder, change!
+
+    def _remaining_str_len(self, s: str) -> int:
+        """Calculates the number of characters left for use with the
+        repeater specifier by ignoring color or repeater specifiers
+        as those will be stripped out during processing."""
+        total_remaining_chars = len(s) # includes color/repeater specifiers
+
+        specifiers_used = ''.join(self._color_or_repeater_regexp.findall(s))
+        specifier_chars_len = len(specifiers_used) # length of specifier strings used
+
+        return total_remaining_chars - specifier_chars_len
 
 
 # Provided for ease-of-typing.
