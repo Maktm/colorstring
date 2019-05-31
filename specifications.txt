@@ -1,1 +1,133 @@
-TODO
+colorstring specification v1
+
+Format: ^[effects][bold][color]
+
+==============
+=   Colors   =
+==============
+The colors are organized so that if you only use the first 16 colors (^0-^15, ^b0-^b15)
+then on a terminal that only supports 8 colors you will have the first 8 colors (^0-^7)
+will print correctly and the rest will print without colors (but won't include the syntax
+inside of the output so that it's stripped).
+
+~ Basic colors ~
+
+^0Hello - ^255Hello = (256 foreground colors)
+^b2Hello - ^b255Hello = (256 background colors)
+
+~ Bright colors ~
+
+^!0Hello - ^!255Hello = (256 bright foreground colors)
+^b0!Hello - ^!b255Hello = (256 bright background colors)
+
+~ Repeater ~
+
+^0*2Hello = Repeat color ^0 for 2 characters
+^w[2]1Hello = Color in one word (a-z, 0-9 chars, no spaces)
+
+~ Reset ~
+
+^. = Reset foreground
+^, = Reset background
+^: = Reset foreground and background
+^~ = Complement of foreground/background
+
+~ Other ~
+^a[1, 2, 3](4) = Alternate over the colors ^1, ^2, ^3 over every 4 characters
+
+===============
+=   Effects   =
+===============
+
+^u = Underlines chars until newline
+^uw = Underline a single word
+
+==============
+=   Cursor   =
+==============
+
+====================
+=   Progress bar   =
+====================
+
+Divide the color configurators into 3 separate colors:
+
+  * 8-bit colors
+  * 16-bit colors (8 normal + 8 bright/bold)
+  * 256-bit colors
+
+Provide the ability to check what the current terminal support (8, 16, 256)
+from colorstring.support import get_color_support() -> (None, 8, 16, 256)
+
+Note: For 8 bit colors, you have 8 foreground + 8 background = 0-9, a-f is more than enough
+Note: For 16 bit colors, you have 8 foreground normal, 8 foreground bright, 8 background normal, 8 background normal = 24 total (not enough!)
+Note: For 256...= 256 * 4 = 1024 colors
+
+Provide a way to reset the foreground/background separately and together
+
+Provide a way to iterate through a range *or* set of colors and repeat it over n characters for the whole output (rainbow)
+
+Provide a module for moving the cursor around (from colorstring.cursor import move_up, move_down, move_left, move_right)
+
+Provide a progress bar module (from colorstring.progressbar import ProgressBar)
+
+pg.update(val) -> Update to value `val`
+pg.increment(a) -> Increment current value by `a`
+pg.decrement(a) -> Decrement current value by `a`
+
+with ProgressBar(100) as pg:
+  pg.update((completed//total) * 100)
+
+class ProgressBar:
+  def __init__(self, max=100) -> None:
+    pass
+    
+  def update(val: Union[int, float]) -> None:
+    self.val = val
+  
+  def increment(val: Union[int, float]) -> None:
+    self.
+
+Question: How do I support 8, 16, and 256 colors all at once?
+^1, ^2, ..., ^9, ^12 - Foreground colors (10 foreground colors)
+^a, ^b, ..., ^z - Background colors (26 background colors)
+^[f12b2]Helloworld
+^Hello
+^Hello
+
+^*! Use the bold version, if available
+
+from colorstring.colors import cs
+
+print(cs("^1Hello ^2world"))
+
+Modules:
+colorstring.progressbar
+colorstring.colors
+colorstring.cursor
+colorstring.effects
+
+Provide the effects under the same cs function with a start/end syntax for what to underline.
+
+* In the event that you parse a ^* with an invalid *, provide the global option to either throw an exception when this occurs, or to print out the string as is (e.g. Hello ^what will be printed).
+* To print out a caret symbol (i.e. ^), use the backslash character (i.e. \^ will print out ^)
+
+Syntax
+======
+^[f1*2]Hello ^[b1]world
+^[pb100,function]
+
+Foreground colors 256: ^[1], ^[2], ^[3], ..., ^[16]
+Foreground colors 256 (bright): ^[1!], ^[2!], ^[3!], ..., ^[16!]
+
+
+^[.]Hello world
+
+^[f1]H^[f2]e^[f3]llo OR ^[(f1, f2, f3)*1] colors 3 characters with different colors (foreground1, foreground2, foreground3)
+
+^1Hello
+^255Hello
+
+* Remove exception usage. If a "bad" string is provided, it's just printed (e.g. ^399)
+* Include a list of all the colors with a picture next to it on the README
+* Provide backwards compat so if you use the 8 colors then it works on 8, 16, 32 and if you use 16 on a 8 then the 8 print then the other 8 just show up as text (or just get processed)
