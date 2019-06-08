@@ -8,7 +8,7 @@ Format:
 
     Text colored using the colorstring DSL all use the same format of:
 
-        ^[reset][s][effect][s]f[fgcolor][!][s]b[bgcolor][!][s]
+        ^\[[reset][s][effect][s]f[fgcolor][s]b[bgcolor][s]\]
 
     When using the format, the order in which you use the different specifiers
     makes all the difference. Using the wrong order will likely cause you to
@@ -40,24 +40,21 @@ Specifiers:
         ^y      Sets the font style to no underline
         ^S      Sets the font style to strikethrough
         ^t      Sets the font style to no strikethrough
-        ^i      Sets the font style to underline
-        ^o      Sets the font style to no underline
+        ^i      Sets the font style to italic
+        ^o      Sets the font style to no italic
 
     Foreground colors: Depending on the terminal in use, colorstring can provide
-    up to 256 colors for the foreground and background. Additionally, each color
-    can be printed using its brighter equivalent. The basic syntax for foreground
+    up to 256 colors for the foreground and background. The basic syntax for foreground
     colors is as follows:
 
-        ^f[fgcolor][!]
+        ^f[fgcolor]
 
     [fgcolor] can be replaced by any number between 0-7, 0-127, and 0-255 for
-    8-color, 128-color, and 256-color supported terminals, respectively. To use
-    the brighter version of these foreground colors, simply add a ! at the end.
+    8-color, 128-color, and 256-color supported terminals, respectively.
     Here are some examples:
 
         ^f12        Sets the foreground color to 12
         ^f128       Sets the foreground color to 128 on a terminal with 256 colors
-        ^f0!        Sets the foreground color to the bright version of 0
 
     TODO: When using colors out of the range supported by the terminal you are using,
      the foreground color specifiers are simply substituted with empty strings.
@@ -68,10 +65,7 @@ Specifiers:
     syntax than foreground colors, they are identical in every other aspect but as
     the background color equivalent. The syntax is as follows:
 
-        ^b[bgcolor][!]
-
-    [bgcolor] is the [fgcolor] equivalent but for background colors and [!] also serves
-    the same purpose as for foreground colors.
+        ^b[bgcolor]
 
     Span: These are used in combination with all the 4 specifiers available (reset,
     effect, fgcolor, and bgcolor) to create a range of characters or words where the
@@ -79,10 +73,12 @@ Specifiers:
     use a specifier then undo it after a certain number of characters/words. A span
     takes the format of:
 
-        *[s] or *[s]w
+        *[s] or *[s]w or **
 
     The former syntax is used to create a span over a specific number of characters
     while the latter is used to create a span over a specific number of words. Both
     syntaxes should replace [s] with a positive, non-zero integer.
+    Using the last syntax will place a sets at the very end of the string. This means
+    that once the string is printed, everything is reset for the next string to print.
 
     TODO: When using the latter syntax, a word is everything that comes before a space.
