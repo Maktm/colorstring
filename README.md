@@ -49,4 +49,3 @@ in the event that an out-of-bounds repeater was provided.
 
 ## Author
 * [GitHub](https://www.github.com/Maktm)
-* [Twitter](https://www.twitter.com/maktmw)
