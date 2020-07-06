@@ -69,12 +69,12 @@ class ColoredString:
     coded string with the use of the __str__ method.
     """
     # Regular expressions / patterns
-    _color_pattern = r'\^[a-i0-8]'
+    _color_pattern = r'\^[a-i0-8.]'
     _repeater_pattern = r'[*]+[1-9]+'
     _color_and_repeater_pattern = ''.join([_color_pattern, _repeater_pattern])
     _color_or_repeater_pattern = '|'.join([_color_pattern, _repeater_pattern])
     _repeater_count_pattern = r'\*([1-9]+)'
-    _color_id_pattern = r'\^([a-i0-8])'
+    _color_id_pattern = r'\^([a-i0-8.])'
 
     # Compiled regular expressions
     _color_regexp = re.compile(_color_pattern)
@@ -203,7 +203,8 @@ class ColoredString:
             '5': '\u001b[36m',
             '6': '\u001b[37m',
             '7': '\u001b[35m',
-            '8': '\u001b[30m'
+            '8': '\u001b[30m',
+            '.': '\u001b[0m',
         }[color_id]
 
 
