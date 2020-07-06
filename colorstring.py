@@ -49,6 +49,7 @@ import re
 
 from typing import Tuple, Match
 
+
 class UnsafeRepeaterException(Exception):
     """Used to let the user know that a repeater with a bad
     count value was specified. Running that repeater against
@@ -56,12 +57,14 @@ class UnsafeRepeaterException(Exception):
 
     TODO: It would be a good idea to include more debug information.
     """
+
     def __init__(self, count) -> None:
         """Initializes an UnsafeRepeaterException by storing the
         count value that caused a red flag."""
         super().__init__("Unsafe repeater was specified (out-of-bounds)")
 
         self.count = count
+
 
 class ColoredString:
     """Specify a string using the syntax stated above and this
@@ -127,7 +130,8 @@ class ColoredString:
         str_after_match = match.string[match.start() + len(match.group()):]
         remaining_chars_len = self._remaining_str_len(str_after_match)
 
-        repeater_count_str = self._repeater_count_regexp.search(match.group()).groups()[0]
+        repeater_count_str = self._repeater_count_regexp.search(
+            match.group()).groups()[0]
         repeater_count = int(repeater_count_str)
 
         if repeater_count > remaining_chars_len:
@@ -156,10 +160,11 @@ class ColoredString:
         repeater specifier by ignoring color or repeater specifiers
         as those will be stripped out during processing.
         """
-        total_remaining_chars = len(s) # includes color/repeater specifiers
+        total_remaining_chars = len(s)  # includes color/repeater specifiers
 
         specifiers_used = ''.join(self._color_or_repeater_regexp.findall(s))
-        specifier_chars_len = len(specifiers_used) # length of specifier strings used
+        # length of specifier strings used
+        specifier_chars_len = len(specifiers_used)
 
         return total_remaining_chars - specifier_chars_len
 
